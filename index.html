@@ -88,7 +88,8 @@
         som gjør Åre til et unikt reisemål.
       </p>
       <div id="gameContainer"></div>
-      <button id="spinButton">Spin</button>
+<button id="spinButton">Spin</button>
+<p id="winningNumber">Plz gi oss finansiell støtte på kroner  </p>
     </section>
 
     <section id="the-journey">
@@ -125,30 +126,14 @@
   </body>
 
   <script>
-    var config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    backgroundColor: '#fff',
-    parent: 'gameContainer',
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
-
-var game = new Phaser.Game(config);
-var wheel;
-var textLabels = [];
-var sectors = 24;
-var spinning = false;
-var rotationSpeed = 0;
+  var game, wheel, textLabels = [], sectors = 24, spinning = false, rotationSpeed = 0;
+var triangle, winningNumberDisplay;
 
 function preload() {}
 
 function create() {
-    wheel = this.add.graphics({ x: 400, y: 300 });
+    this.cameras.main.setBackgroundColor('#ffffff'); // Ensure background color matches the style
+    wheel = this.add.graphics({ x: 300, y: 275 }); // Adjust for better centering
 
     // Drawing the wheel
     for (let i = 0; i < sectors; i++) {
@@ -160,6 +145,11 @@ function create() {
     wheel.lineStyle(2, 0x000000);
     wheel.strokeCircle(0, 0, 200);
 
+    // Draw the triangle for the winning number indicator
+    triangle = this.add.graphics({ fillStyle: { color: 0x000000 } });
+    triangle.fillTriangle(-30, -12, 30, -12, 0, -40);
+    triangle.setPosition(300, 85); // Adjust position to match the top of the wheel
+
     // Creating text labels
     for (let i = 0; i < sectors; i++) {
         const angle = Phaser.Math.DegToRad(360 / sectors * (i + 0.5));
@@ -170,6 +160,9 @@ function create() {
         textLabels.push(text);
     }
 
+    // Reference to the winning number display element
+    winningNumberDisplay = document.getElementById('winningNumber');
+
     // Spin button
     document.getElementById('spinButton').addEventListener('click', spinWheel);
 }
@@ -177,15 +170,20 @@ function create() {
 function update() {
     textLabels.forEach((label, index) => {
         const angle = Phaser.Math.DegToRad(wheel.angle + 360 / sectors * (index + 0.5));
-        label.x = 400 + 180 * Math.cos(angle);
-        label.y = 300 + 180 * Math.sin(angle);
+        label.x = wheel.x + 180 * Math.cos(angle);
+        label.y = wheel.y + 180 * Math.sin(angle);
         label.rotation = angle + Phaser.Math.DegToRad(90);
     });
 
     if (spinning) {
         wheel.angle += rotationSpeed;
         if (rotationSpeed > 0) rotationSpeed -= 0.05; // Slow down
-        if (rotationSpeed <= 0) spinning = false; // Stop
+        if (rotationSpeed <= 0) {
+            spinning = false; // Stop
+            const winningIndex = Math.floor(((360 - wheel.angle) % 360) / (360 / sectors));
+            const winningNumber = (winningIndex + 1) % sectors;
+            winningNumberDisplay.innerText = `Winning Number: ${winningNumber}`;
+        }
     }
 }
 
@@ -195,6 +193,22 @@ function spinWheel() {
         rotationSpeed = Phaser.Math.Between(8, 12); // Initial speed
     }
 }
+
+window.onload = function() {
+    var config = {
+        type: Phaser.AUTO,
+        width: 600,
+        height: 550,
+        parent: 'gameContainer',
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+    game = new Phaser.Game(config);
+};
+
 </script>
   </script>
 </html>
