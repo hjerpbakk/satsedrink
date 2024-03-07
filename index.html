@@ -15,6 +15,7 @@
     <meta name="msapplication-TileColor" content="#da532c" />
     <meta name="theme-color" content="#ffffff" />
     <title>Roadtrip til Åre</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
     <style>
       body {
         font-family: papyrus;
@@ -23,7 +24,7 @@
         color: #333;
       }
       header {
-        background-color: #ff5733; /* Placeholder for your logo's primary color */
+        background-color: #ff5733;
         color: #fff;
         padding: 20px;
         text-align: center;
@@ -44,6 +45,34 @@
         bottom: 0;
         width: 100%;
       }
+      #gameContainer {
+        width: 800px;
+        height: 600px;
+      }
+      #spinButton {
+            font-size: 24px; /* Større skriftstørrelse */
+            font-weight: bold; /* Fetere tekst */
+            color: white; /* Hvit tekst */
+            background-color: #ff4500; /* Iøynefallende farge */
+            padding: 15px 30px; /* Større padding for en større knapp */
+            border: none; /* Fjerner standard kantlinje */
+            border-radius: 5px; /* Avrundede hjørner for en glattere look */
+            cursor: pointer; /* Endrer musepeker til en peker, indikerer klikkbarhet */
+            box-shadow: 0 4px #999; /* Legger til en enkel skyggeeffekt for dybde */
+            transition: all 0.3s; /* Gjør overganger glattere */
+            margin: auto;
+        }
+        #spinButton:hover {
+            background-color: #e33e00; /* Mørkere farge når musen er over */
+        }
+        #spinButton:active {
+            background-color: #c23000; /* Enda mørkere når knappen er klikket */
+            box-shadow: 0 2px #666; /* Mindre skygge for å simulere trykk */
+            transform: translateY(2px); /* Flytter knappen litt ned for å simulere trykk */
+        }
+        #gameContainer {
+            margin-bottom: 20px;
+        }
     </style>
   </head>
   <body>
@@ -57,6 +86,8 @@
         Åre er et vinterparadis for skientusiaster og eventyrere. Utforsk hva
         som gjør Åre til et unikt reisemål.
       </p>
+      <div id="gameContainer"></div>
+      <button id="spinButton">Spin</button>
     </section>
 
     <section id="the-journey">
@@ -68,7 +99,6 @@
     <section id="gallery">
       <h2>Galleri</h2>
       <p>Ta en titt på våre favorittøyeblikk fra Åre og reisen dit.</p>
-      <!-- Example image, replace with your own -->
       <img src="/img/satsehytta.PNG" width="200px" />
       <img src="/img/shot.png" width="200px" />
       <img src="/img/satsedrink-logo.png" width="200px" />
@@ -86,4 +116,78 @@
       <p>&copy; 2024 Roadtrip til Åre</p>
     </footer>
   </body>
+
+  <script>
+    var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    backgroundColor: '#fff',
+    parent: 'gameContainer',
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
+
+var game = new Phaser.Game(config);
+var wheel;
+var textLabels = [];
+var sectors = 24;
+var spinning = false;
+var rotationSpeed = 0;
+
+function preload() {}
+
+function create() {
+    wheel = this.add.graphics({ x: 400, y: 300 });
+
+    // Drawing the wheel
+    for (let i = 0; i < sectors; i++) {
+        wheel.fillStyle(i % 2 === 0 ? 0xfe0969 : 0xcad91e, 1);
+        wheel.slice(0, 0, 200, Phaser.Math.DegToRad(360 / sectors * i), Phaser.Math.DegToRad(360 / sectors * (i + 1)), false);
+        wheel.fillPath();
+    }
+    wheel.strokePath();
+    wheel.lineStyle(2, 0x000000);
+    wheel.strokeCircle(0, 0, 200);
+
+    // Creating text labels
+    for (let i = 0; i < sectors; i++) {
+        const angle = Phaser.Math.DegToRad(360 / sectors * (i + 0.5));
+        const text = this.add.text(0, 0, (i + 1).toString(), {
+            color: "#000",
+            fontSize: "20px"
+        }).setOrigin(0.5);
+        textLabels.push(text);
+    }
+
+    // Spin button
+    document.getElementById('spinButton').addEventListener('click', spinWheel);
+}
+
+function update() {
+    textLabels.forEach((label, index) => {
+        const angle = Phaser.Math.DegToRad(wheel.angle + 360 / sectors * (index + 0.5));
+        label.x = 400 + 180 * Math.cos(angle);
+        label.y = 300 + 180 * Math.sin(angle);
+        label.rotation = angle + Phaser.Math.DegToRad(90);
+    });
+
+    if (spinning) {
+        wheel.angle += rotationSpeed;
+        if (rotationSpeed > 0) rotationSpeed -= 0.05; // Slow down
+        if (rotationSpeed <= 0) spinning = false; // Stop
+    }
+}
+
+function spinWheel() {
+    if (!spinning) {
+        spinning = true;
+        rotationSpeed = Phaser.Math.Between(8, 12); // Initial speed
+    }
+}
+</script>
+  </script>
 </html>
