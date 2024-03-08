@@ -158,9 +158,6 @@ function create() {
         textLabels.push(text);
     }
 
-    // Reference to the winning number display element
-    winningNumberDisplay = document.getElementById('winningNumber');
-
     // Spin button
     document.getElementById('spinButton').addEventListener('click', spinWheel);
 }
@@ -180,7 +177,7 @@ function update() {
             spinning = false; // Stop
             const winningIndex = Math.floor(((360 - wheel.angle) % 360) / (360 / sectors));
             const winningNumber = (winningIndex + 1) % sectors;
-            winningNumberDisplay.innerText = `Winning Number: ${winningNumber}`;
+            // TODO: Display the winning number
         }
     }
 }
