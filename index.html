@@ -30,7 +30,7 @@
         text-align: center;
       }
       section {
-        padding: 20px;
+        padding-left:20px;
       }
       .gallery img {
         width: 100%;
@@ -48,6 +48,8 @@
       #gameContainer {
         width: 800px;
         height: 600px;
+        margin: 0;
+        padding: 0;
       }
       #spinButton {
             font-size: 24px; /* Større skriftstørrelse */
@@ -80,16 +82,11 @@
       <h1>Velkommen til vår road trip til Åre!</h1>
     </header>
 
-    <section id="about-are">
-      <h2>Om Åre</h2>
-      <a href="https://www.buymeacoffee.com/2byzwmvhgpk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-      <p>
-        Åre er et vinterparadis for skientusiaster og eventyrere. Utforsk hva
-        som gjør Åre til et unikt reisemål.
-      </p>
-      <div id="gameContainer"></div>
-<button id="spinButton">Spin</button>
-<p id="winningNumber">Plz gi oss finansiell støtte på kroner  </p>
+    <section>
+        <h2>Vi spør nok en gang om deres finansielle støtte</h2>
+        <p><a href="https://www.buymeacoffee.com/2byzwmvhgpk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a></p>
+        <button id="spinButton">Spinn for gi!</button>
+        <div id="gameContainer"></div>
     </section>
 
     <section id="the-journey">
@@ -110,9 +107,10 @@
       <img src="/img/bullet-hole.webp" width="200px" />
       <img src="/img/blueberry.jpg" width="200px" />
       <img src="/img/2.png" width="200px" />
+      <img src="/img/frokost.HEIC" width="200px" />
     </section>
 
-    <section id="contact" style="margin-bottom: 70px">
+    <section id="contact" style="margin-bottom: 100px">
       <h2>Kontakt Oss</h2>
       <p>
         Har du spørsmål eller vil dele din egen historie?
@@ -132,7 +130,7 @@ var triangle, winningNumberDisplay;
 function preload() {}
 
 function create() {
-    this.cameras.main.setBackgroundColor('#ffffff'); // Ensure background color matches the style
+    this.cameras.main.setBackgroundColor('#00ff00'); // Ensure background color matches the style
     wheel = this.add.graphics({ x: 300, y: 275 }); // Adjust for better centering
 
     // Drawing the wheel
