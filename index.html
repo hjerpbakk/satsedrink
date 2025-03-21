@@ -1,209 +1,141 @@
 <!DOCTYPE html>
-<html lang="no">
+<html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <meta property="og:title" content="Satsedrink" />
-    <meta property="og:image" content="./img/satsedrink-logo.png" />
-
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="manifest" href="/site.webmanifest" />
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
-    <meta name="msapplication-TileColor" content="#da532c" />
-    <meta name="theme-color" content="#ffffff" />
-    <title>Roadtrip til Åre</title>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
-    <style>
-      body {
-        font-family: papyrus;
-        margin: 0;
-        padding: 0;
-        color: #333;
-      }
-      header {
-        background-color: #ff5733;
-        color: #fff;
-        padding: 20px;
-        text-align: center;
-      }
-      section {
-        padding-left:20px;
-      }
-      .gallery img {
-        width: 100%;
-        height: auto;
-      }
-      footer {
-        background-color: #333;
-        color: #fff;
-        text-align: center;
-        padding: 10px;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-      }
-      #gameContainer {
-        width: 800px;
-        height: 600px;
-        margin: 0;
-        padding: 0;
-      }
-      #spinButton {
-            font-size: 24px; /* Større skriftstørrelse */
-            font-weight: bold; /* Fetere tekst */
-            color: white; /* Hvit tekst */
-            background-color: #ff4500; /* Iøynefallende farge */
-            padding: 15px 30px; /* Større padding for en større knapp */
-            border: none; /* Fjerner standard kantlinje */
-            border-radius: 5px; /* Avrundede hjørner for en glattere look */
-            cursor: pointer; /* Endrer musepeker til en peker, indikerer klikkbarhet */
-            box-shadow: 0 4px #999; /* Legger til en enkel skyggeeffekt for dybde */
-            transition: all 0.3s; /* Gjør overganger glattere */
-            margin: auto;
-        }
-        #spinButton:hover {
-            background-color: #e33e00; /* Mørkere farge når musen er over */
-        }
-        #spinButton:active {
-            background-color: #c23000; /* Enda mørkere når knappen er klikket */
-            box-shadow: 0 2px #666; /* Mindre skygge for å simulere trykk */
-            transform: translateY(2px); /* Flytter knappen litt ned for å simulere trykk */
-        }
-        #gameContainer {
-            margin-bottom: 20px;
-        }
-    </style>
+    <title>Drunken Ski Game</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
   </head>
   <body>
-    <header>
-      <h1>Velkommen til vår road trip til Åre!</h1>
-    </header>
-
-    <section>
-        <h2>Vi spør nok en gang om deres finansielle støtte</h2>
-        <p><a href="https://www.buymeacoffee.com/2byzwmvhgpk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a></p>
-        <button id="spinButton">Spinn for gi!</button>
-        <div id="gameContainer"></div>
-    </section>
-
-    <section id="the-journey">
-      <h2>Vår Reiserute</h2>
-      <p>Oppdag ruten, sevärdhetene underveis, og våre beste reisetips.</p>
-      <img src="/img/kart.png" width="700px" />
-    </section>
-
-
-    <section id="gallery">
-      <h2>Galleri</h2>
-      <p>Ta en titt på våre favorittøyeblikk fra Åre og reisen dit.</p>
-      <img src="/img/satsehytta.PNG" width="200px" />
-      <img src="/img/shot.png" width="200px" />
-      <img src="/img/satsedrink-logo.png" width="200px" />
-      <img src="/img/bolle.png" width="200px" />
-      <img src="/img/apple-music.png" width="200px" />
-      <img src="/img/bullet-hole.webp" width="200px" />
-      <img src="/img/blueberry.jpg" width="200px" />
-      <img src="/img/2.png" width="200px" />
-      <img src="/img/frokost.HEIC" width="200px" />
-    </section>
-
-    <section id="contact" style="margin-bottom: 100px">
-      <h2>Kontakt Oss</h2>
-      <p>
-        Har du spørsmål eller vil dele din egen historie?
-        <a href="https://bekk.slack.com/archives/C0670ME4JNS">Ta kontakt!</a>
-      </p>
-    </section>
-
-    <footer>
-      <p>&copy; 2024 Roadtrip til Åre</p>
-    </footer>
-  </body>
-
-  <script>
-  var game, wheel, textLabels = [], sectors = 24, spinning = false, rotationSpeed = 0;
-var triangle, winningNumberDisplay;
-
-function preload() {}
-
-function create() {
-    this.cameras.main.setBackgroundColor('#ffffff'); // Ensure background color matches the style
-    wheel = this.add.graphics({ x: 300, y: 275 }); // Adjust for better centering
-
-    // Drawing the wheel
-    for (let i = 0; i < sectors; i++) {
-        wheel.fillStyle(i % 2 === 0 ? 0xfe0969 : 0xcad91e, 1);
-        wheel.slice(0, 0, 200, Phaser.Math.DegToRad(360 / sectors * i), Phaser.Math.DegToRad(360 / sectors * (i + 1)), false);
-        wheel.fillPath();
-    }
-    wheel.strokePath();
-    wheel.lineStyle(2, 0x000000);
-    wheel.strokeCircle(0, 0, 200);
-
-    // Draw the triangle for the winning number indicator
-    triangle = this.add.graphics({ fillStyle: { color: 0x000000 } });
-    triangle.fillTriangle(-30, -12, 30, -12, 0, -40);
-    triangle.setPosition(300, 85); // Adjust position to match the top of the wheel
-
-    // Creating text labels
-    for (let i = 0; i < sectors; i++) {
-        const angle = Phaser.Math.DegToRad(360 / sectors * (i + 0.5));
-        const text = this.add.text(0, 0, (i + 1).toString(), {
-            color: "#000",
-            fontSize: "20px"
-        }).setOrigin(0.5);
-        textLabels.push(text);
-    }
-
-    // Spin button
-    document.getElementById('spinButton').addEventListener('click', spinWheel);
-}
-
-function update() {
-    textLabels.forEach((label, index) => {
-        const angle = Phaser.Math.DegToRad(wheel.angle + 360 / sectors * (index + 0.5));
-        label.x = wheel.x + 180 * Math.cos(angle);
-        label.y = wheel.y + 180 * Math.sin(angle);
-        label.rotation = angle + Phaser.Math.DegToRad(90);
-    });
-
-    if (spinning) {
-        wheel.angle += rotationSpeed;
-        if (rotationSpeed > 0) rotationSpeed -= 0.05; // Slow down
-        if (rotationSpeed <= 0) {
-            spinning = false; // Stop
-            const winningIndex = Math.floor(((360 - wheel.angle) % 360) / (360 / sectors));
-            const winningNumber = (winningIndex + 1) % sectors;
-            // TODO: Display the winning number
-        }
-    }
-}
-
-function spinWheel() {
-    if (!spinning) {
-        spinning = true;
-        rotationSpeed = Phaser.Math.Between(8, 12); // Initial speed
-    }
-}
-
-window.onload = function() {
-    var config = {
+    <script>
+      var config = {
         type: Phaser.AUTO,
-        width: 600,
-        height: 550,
-        parent: 'gameContainer',
-        scene: {
-            preload: preload,
-            create: create,
-            update: update
-        }
-    };
-    game = new Phaser.Game(config);
-};
+        width: 360,
+        height: 640,
+        physics: {
+          default: "arcade",
+          arcade: { gravity: { y: 0 }, debug: false },
+        },
+        scene: { preload: preload, create: create, update: update },
+        scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      };
 
-</script>
-  </script>
+      var game = new Phaser.Game(config);
+      var player, cursors, collectibles, finishLine, trees, drunkenText;
+      var drunkenness = 0;
+      var finishReached = false;
+      var pointerActive = false;
+
+      function preload() {
+        this.load.image("player", "/img/skier.png");
+        this.load.image(
+          "collectible",
+          "https://labs.phaser.io/assets/sprites/star.png"
+        );
+        this.load.image(
+          "finish",
+          "https://labs.phaser.io/assets/sprites/flag.png"
+        );
+        this.load.image(
+          "tree",
+          "https://labs.phaser.io/assets/sprites/tree.png"
+        );
+      }
+
+      function create() {
+        this.cameras.main.setBackgroundColor("#ffffff");
+        player = this.physics.add.sprite(180, 50, "player");
+        player.setScale(0.1);
+        player.setCollideWorldBounds(true);
+        cursors = this.input.keyboard.createCursorKeys();
+        collectibles = this.physics.add.group();
+        for (var i = 0; i < 20; i++) {
+          var x = Phaser.Math.Between(30, 330);
+          var y = Phaser.Math.Between(100, 5000);
+          collectibles.create(x, y, "collectible");
+        }
+        trees = this.physics.add.staticGroup();
+        for (var j = 0; j < 30; j++) {
+          var x = Phaser.Math.Between(20, 340);
+          var y = Phaser.Math.Between(100, 5000);
+          trees.create(x, y, "tree");
+        }
+        finishLine = this.physics.add
+          .staticSprite(180, 5200, "finish")
+          .setScale(1.5);
+        var finishText = this.add.text(
+          finishLine.x - 40,
+          finishLine.y - 60,
+          "Ski Under",
+          { font: "16px Arial", fill: "#000" }
+        );
+        finishText.setScrollFactor(0);
+        drunkenText = this.add
+          .text(10, 10, "Drunkenness: 0", { font: "20px Arial", fill: "#000" })
+          .setScrollFactor(0);
+        this.physics.add.overlap(player, collectibles, collectItem, null, this);
+        this.physics.add.overlap(player, finishLine, reachFinish, null, this);
+        this.physics.add.collider(player, trees);
+        this.cameras.main.setBounds(0, 0, 360, 5400);
+        this.physics.world.setBounds(0, 0, 360, 5400);
+        this.cameras.main.startFollow(player, true, 0.05, 0.05);
+        this.input.on(
+          "pointerdown",
+          function () {
+            pointerActive = true;
+          },
+          this
+        );
+        this.input.on(
+          "pointerup",
+          function () {
+            pointerActive = false;
+          },
+          this
+        );
+      }
+
+      function update() {
+        if (finishReached) return;
+        var speed = 200;
+        var controlFactor = Math.max(1 - drunkenness / 100, 0.3);
+        player.setVelocityY(speed);
+        var moveLeft = cursors.left.isDown;
+        var moveRight = cursors.right.isDown;
+        if (!moveLeft && !moveRight && pointerActive) {
+          if (this.input.activePointer.x < config.width / 2) moveLeft = true;
+          else moveRight = true;
+        }
+        if (moveLeft) player.setVelocityX(-speed * controlFactor);
+        else if (moveRight) player.setVelocityX(speed * controlFactor);
+        else player.setVelocityX(0);
+        if (drunkenness > 0) {
+          player.x += Phaser.Math.Between(-drunkenness / 50, drunkenness / 50);
+        }
+        drunkenText.setText("Drunkenness: " + drunkenness);
+      }
+
+      function collectItem(player, item) {
+        item.disableBody(true, true);
+        drunkenness += 10;
+      }
+
+      function reachFinish(player, finish) {
+        finishReached = true;
+        var message =
+          drunkenness >= 50
+            ? "After ski time!"
+            : "Not drunk enough for afterski!";
+        var finishMessage = this.add.text(player.x - 80, player.y, message, {
+          font: "24px Arial",
+          fill: "#f00",
+        });
+        finishMessage.setScrollFactor(0);
+        player.setVelocity(0);
+      }
+    </script>
+  </body>
 </html>
