@@ -116,7 +116,8 @@
           return;
         }
         if (finishReached && !drunkEnough) return;
-        var speed = 200;
+        var baseSpeed = 200;
+        var speed = baseSpeed + (200 * player.y) / 5400;
         var controlFactor = Math.max(1 - drunkenness / 100, 0.3);
         player.setVelocityY(speed);
         var moveLeft = cursors.left.isDown;
@@ -138,7 +139,7 @@
       }
       function reachFinish(player, finish) {
         if (finishReached) return;
-        if (drunkenness >= 50) {
+        if (drunkenness >= 100) {
           finishReached = true;
           drunkEnough = true;
         } else {
