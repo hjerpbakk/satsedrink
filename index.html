@@ -24,9 +24,11 @@
       };
       var game = new Phaser.Game(config);
       var player, cursors, collectibles, finishLine, trees, drunkenText;
-      var drunkenness = 0;
-      var finishReached = false;
-      var pointerActive = false;
+      var drunkenness = 0,
+        finishReached = false,
+        drunkEnough = false,
+        gameEnded = false,
+        pointerActive = false;
       function preload() {
         this.load.image("player", "/img/skier.png");
         this.load.image(
@@ -59,14 +61,12 @@
         trees = this.physics.add.staticGroup();
         for (var j = 0; j < 30; j++) {
           var lane = Phaser.Math.Between(0, 2);
-          var x;
-          if (lane === 0) {
-            x = Phaser.Math.Between(20, 120);
-          } else if (lane === 1) {
-            x = Phaser.Math.Between(130, 230);
-          } else {
-            x = Phaser.Math.Between(240, 340);
-          }
+          var x =
+            lane === 0
+              ? Phaser.Math.Between(20, 120)
+              : lane === 1
+              ? Phaser.Math.Between(130, 230)
+              : Phaser.Math.Between(240, 340);
           var y = Phaser.Math.Between(100, 5000);
           trees.create(x, y, "tree");
         }
@@ -98,7 +98,24 @@
         );
       }
       function update() {
-        if (finishReached) return;
+        if (gameEnded) return;
+        if (finishReached && drunkEnough) {
+          if (player.y >= finishLine.y) {
+            player.x = finishLine.x;
+            player.y = finishLine.y;
+            player.setVelocity(0);
+            gameEnded = true;
+            this.add
+              .text(config.width / 2, config.height / 3, "Afterski!", {
+                font: "24px Arial",
+                fill: "#f00",
+              })
+              .setScrollFactor(0)
+              .setOrigin(0.5);
+          }
+          return;
+        }
+        if (finishReached && !drunkEnough) return;
         var speed = 200;
         var controlFactor = Math.max(1 - drunkenness / 100, 0.3);
         player.setVelocityY(speed);
@@ -111,9 +128,8 @@
         if (moveLeft) player.setVelocityX(-speed * controlFactor);
         else if (moveRight) player.setVelocityX(speed * controlFactor);
         else player.setVelocityX(0);
-        if (drunkenness > 0) {
+        if (drunkenness > 0)
           player.x += Phaser.Math.Between(-drunkenness / 50, drunkenness / 50);
-        }
         drunkenText.setText("Promille: " + drunkenness / 100);
       }
       function collectItem(player, item) {
@@ -122,26 +138,23 @@
       }
       function reachFinish(player, finish) {
         if (finishReached) return;
-        finishReached = true;
-        player.setVelocity(0);
         if (drunkenness >= 50) {
-          var msg = this.add
-            .text(config.width / 2, config.height / 3, "Afterski!", {
-              font: "24px Arial",
-              fill: "#f00",
-            })
-            .setScrollFactor(0);
-          msg.setOrigin(0.5);
+          finishReached = true;
+          drunkEnough = true;
         } else {
-          var msg = this.add
+          finishReached = true;
+          drunkEnough = false;
+          player.setVelocity(0);
+          gameEnded = true;
+          this.add
             .text(
               config.width / 2,
               config.height / 3,
               "Not drunk enough for afterski!",
               { font: "24px Arial", fill: "#f00" }
             )
-            .setScrollFactor(0);
-          msg.setOrigin(0.5);
+            .setScrollFactor(0)
+            .setOrigin(0.5);
         }
       }
     </script>
