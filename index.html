@@ -42,20 +42,18 @@
       function create() {
         this.cameras.main.setBackgroundColor("#ffffff");
         player = this.physics.add.sprite(180, 50, "player");
-        player.setScale(0.1);
         player.setCollideWorldBounds(true);
         player.body.setSize(
-          player.displayWidth * 0.8,
-          player.displayHeight * 0.8
+          player.displayWidth * 0.3,
+          player.displayHeight * 0.2
         );
         cursors = this.input.keyboard.createCursorKeys();
         trees = this.physics.add.staticGroup();
         for (var j = 0; j < 50; j++) {
           var treeType = Phaser.Math.Between(0, 1) === 0 ? "tree1" : "tree2";
-          var pos = getValidTreePosition(this, treeType, 0.1);
+          var pos = getValidTreePosition(this, treeType, 1);
           if (pos) {
             var tree = trees.create(pos.x, pos.y, treeType);
-            tree.setScale(0.1);
             tree.refreshBody();
           }
         }
@@ -66,7 +64,6 @@
           var pos = getValidCollectiblePosition(this, key);
           if (pos) {
             var item = collectibles.create(pos.x, pos.y, key);
-            item.setScale(0.05);
             item.refreshBody();
           }
         }
@@ -74,7 +71,7 @@
           .staticSprite(180, 5200, "finish")
           .setScale(0.5);
         drunkenText = this.add
-          .text(10, 10, "Drunkenness: 0", { font: "20px Arial", fill: "#000" })
+          .text(10, 10, "Promille: 0", { font: "20px Arial", fill: "#000" })
           .setScrollFactor(0);
         this.physics.add.overlap(player, collectibles, collectItem, null, this);
         this.physics.add.overlap(player, finishLine, reachFinish, null, this);
@@ -143,7 +140,7 @@
         function getValidCollectiblePosition(scene, key) {
           var attempts = 0;
           var maxAttempts = 50;
-          var scale = 0.05;
+          var scale = 1;
           var image = scene.textures.get(key).getSourceImage();
           var width = image.width * scale;
           var height = image.height * scale;
@@ -162,6 +159,15 @@
                 Phaser.Geom.Intersects.RectangleToRectangle(
                   candidateRect,
                   tree.getBounds()
+                )
+              )
+                valid = false;
+            });
+            collectibles.getChildren().forEach(function (glass) {
+              if (
+                Phaser.Geom.Intersects.RectangleToRectangle(
+                  candidateRect,
+                  glass.getBounds()
                 )
               )
                 valid = false;
