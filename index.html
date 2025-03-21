@@ -31,14 +31,13 @@
         pointerActive = false;
       function preload() {
         this.load.image("player", "/img/skier.png");
-        this.load.image(
-          "collectible",
-          "https://labs.phaser.io/assets/sprites/star.png"
-        );
         this.load.image("finish", "/img/afterski.png");
         this.load.image("tree1", "/img/tree1.png");
         this.load.image("tree2", "/img/tree2.png");
-        this.load.image("afterski", "/img/afterski.png");
+        this.load.image("whitewine", "/img/whitewine.png");
+        this.load.image("redwine", "/img/redwine.png");
+        this.load.image("beer", "/img/beer.png");
+        this.load.image("shotteglass", "/img/shotteglass.png");
       }
       function create() {
         this.cameras.main.setBackgroundColor("#ffffff");
@@ -50,26 +49,26 @@
           player.displayHeight * 0.8
         );
         cursors = this.input.keyboard.createCursorKeys();
-        collectibles = this.physics.add.group();
-        for (var i = 0; i < 20; i++) {
-          var x = Phaser.Math.Between(30, 330);
-          var y = Phaser.Math.Between(100, 5000);
-          collectibles.create(x, y, "collectible");
-        }
         trees = this.physics.add.staticGroup();
-        for (var j = 0; j < 30; j++) {
-          var lane = Phaser.Math.Between(0, 2);
-          var x =
-            lane === 0
-              ? Phaser.Math.Between(20, 120)
-              : lane === 1
-              ? Phaser.Math.Between(130, 230)
-              : Phaser.Math.Between(240, 340);
-          var y = Phaser.Math.Between(100, 5000);
+        for (var j = 0; j < 50; j++) {
           var treeType = Phaser.Math.Between(0, 1) === 0 ? "tree1" : "tree2";
-          var tree = trees.create(x, y, treeType);
-          tree.setScale(0.1);
-          tree.refreshBody();
+          var pos = getValidTreePosition(this, treeType, 0.1);
+          if (pos) {
+            var tree = trees.create(pos.x, pos.y, treeType);
+            tree.setScale(0.1);
+            tree.refreshBody();
+          }
+        }
+        collectibles = this.physics.add.group();
+        var wineKeys = ["whitewine", "redwine", "beer", "shotteglass"];
+        for (var i = 0; i < 20; i++) {
+          var key = wineKeys[Phaser.Math.Between(0, wineKeys.length - 1)];
+          var pos = getValidCollectiblePosition(this, key);
+          if (pos) {
+            var item = collectibles.create(pos.x, pos.y, key);
+            item.setScale(0.05);
+            item.refreshBody();
+          }
         }
         finishLine = this.physics.add
           .staticSprite(180, 5200, "finish")
@@ -97,6 +96,81 @@
           },
           this
         );
+        function getValidTreePosition(scene, treeType, scale) {
+          var attempts = 0;
+          var maxAttempts = 50;
+          var image = scene.textures.get(treeType).getSourceImage();
+          var width = image.width * scale;
+          var height = image.height * scale;
+          while (attempts < maxAttempts) {
+            var lane = Phaser.Math.Between(0, 2);
+            var x;
+            if (lane === 0) {
+              var minX = 20 + width / 2;
+              var maxX = 120 - width / 2;
+              x = Phaser.Math.Between(minX, maxX);
+            } else if (lane === 1) {
+              var minX = 130 + width / 2;
+              var maxX = 230 - width / 2;
+              x = Phaser.Math.Between(minX, maxX);
+            } else {
+              var minX = 240 + width / 2;
+              var maxX = 340 - width / 2;
+              x = Phaser.Math.Between(minX, maxX);
+            }
+            var y = Phaser.Math.Between(100 + height / 2, 5000 - height / 2);
+            var candidateRect = new Phaser.Geom.Rectangle(
+              x - width / 2,
+              y - height / 2,
+              width,
+              height
+            );
+            var valid = true;
+            trees.getChildren().forEach(function (tree) {
+              if (
+                Phaser.Geom.Intersects.RectangleToRectangle(
+                  candidateRect,
+                  tree.getBounds()
+                )
+              )
+                valid = false;
+            });
+            if (valid) return { x: x, y: y };
+            attempts++;
+          }
+          return null;
+        }
+        function getValidCollectiblePosition(scene, key) {
+          var attempts = 0;
+          var maxAttempts = 50;
+          var scale = 0.05;
+          var image = scene.textures.get(key).getSourceImage();
+          var width = image.width * scale;
+          var height = image.height * scale;
+          while (attempts < maxAttempts) {
+            var x = Phaser.Math.Between(width / 2, config.width - width / 2);
+            var y = Phaser.Math.Between(100 + height / 2, 5000 - height / 2);
+            var candidateRect = new Phaser.Geom.Rectangle(
+              x - width / 2,
+              y - height / 2,
+              width,
+              height
+            );
+            var valid = true;
+            trees.getChildren().forEach(function (tree) {
+              if (
+                Phaser.Geom.Intersects.RectangleToRectangle(
+                  candidateRect,
+                  tree.getBounds()
+                )
+              )
+                valid = false;
+            });
+            if (valid) return { x: x, y: y };
+            attempts++;
+          }
+          return null;
+        }
       }
       function update() {
         if (gameEnded) return;
