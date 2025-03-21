@@ -36,10 +36,8 @@
           "https://labs.phaser.io/assets/sprites/star.png"
         );
         this.load.image("finish", "/img/afterski.png");
-        this.load.image(
-          "tree",
-          "https://labs.phaser.io/assets/sprites/tree.png"
-        );
+        this.load.image("tree1", "/img/tree1.png");
+        this.load.image("tree2", "/img/tree2.png");
         this.load.image("afterski", "/img/afterski.png");
       }
       function create() {
@@ -68,7 +66,10 @@
               ? Phaser.Math.Between(130, 230)
               : Phaser.Math.Between(240, 340);
           var y = Phaser.Math.Between(100, 5000);
-          trees.create(x, y, "tree");
+          var treeType = Phaser.Math.Between(0, 1) === 0 ? "tree1" : "tree2";
+          var tree = trees.create(x, y, treeType);
+          tree.setScale(0.1);
+          tree.refreshBody();
         }
         finishLine = this.physics.add
           .staticSprite(180, 5200, "finish")
