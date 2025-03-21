@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Drunken Ski Game</title>
+    <title>Afterski or Die</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -22,34 +22,33 @@
         scene: { preload: preload, create: create, update: update },
         scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
       };
-
       var game = new Phaser.Game(config);
       var player, cursors, collectibles, finishLine, trees, drunkenText;
       var drunkenness = 0;
       var finishReached = false;
       var pointerActive = false;
-
       function preload() {
         this.load.image("player", "/img/skier.png");
         this.load.image(
           "collectible",
           "https://labs.phaser.io/assets/sprites/star.png"
         );
-        this.load.image(
-          "finish",
-          "https://labs.phaser.io/assets/sprites/flag.png"
-        );
+        this.load.image("finish", "/img/afterski.png");
         this.load.image(
           "tree",
           "https://labs.phaser.io/assets/sprites/tree.png"
         );
+        this.load.image("afterski", "/img/afterski.png");
       }
-
       function create() {
         this.cameras.main.setBackgroundColor("#ffffff");
         player = this.physics.add.sprite(180, 50, "player");
         player.setScale(0.1);
         player.setCollideWorldBounds(true);
+        player.body.setSize(
+          player.displayWidth * 0.8,
+          player.displayHeight * 0.8
+        );
         cursors = this.input.keyboard.createCursorKeys();
         collectibles = this.physics.add.group();
         for (var i = 0; i < 20; i++) {
@@ -59,20 +58,21 @@
         }
         trees = this.physics.add.staticGroup();
         for (var j = 0; j < 30; j++) {
-          var x = Phaser.Math.Between(20, 340);
+          var lane = Phaser.Math.Between(0, 2);
+          var x;
+          if (lane === 0) {
+            x = Phaser.Math.Between(20, 120);
+          } else if (lane === 1) {
+            x = Phaser.Math.Between(130, 230);
+          } else {
+            x = Phaser.Math.Between(240, 340);
+          }
           var y = Phaser.Math.Between(100, 5000);
           trees.create(x, y, "tree");
         }
         finishLine = this.physics.add
           .staticSprite(180, 5200, "finish")
-          .setScale(1.5);
-        var finishText = this.add.text(
-          finishLine.x - 40,
-          finishLine.y - 60,
-          "Ski Under",
-          { font: "16px Arial", fill: "#000" }
-        );
-        finishText.setScrollFactor(0);
+          .setScale(0.5);
         drunkenText = this.add
           .text(10, 10, "Drunkenness: 0", { font: "20px Arial", fill: "#000" })
           .setScrollFactor(0);
@@ -97,7 +97,6 @@
           this
         );
       }
-
       function update() {
         if (finishReached) return;
         var speed = 200;
@@ -115,26 +114,35 @@
         if (drunkenness > 0) {
           player.x += Phaser.Math.Between(-drunkenness / 50, drunkenness / 50);
         }
-        drunkenText.setText("Drunkenness: " + drunkenness);
+        drunkenText.setText("Promille: " + drunkenness / 100);
       }
-
       function collectItem(player, item) {
         item.disableBody(true, true);
         drunkenness += 10;
       }
-
       function reachFinish(player, finish) {
+        if (finishReached) return;
         finishReached = true;
-        var message =
-          drunkenness >= 50
-            ? "After ski time!"
-            : "Not drunk enough for afterski!";
-        var finishMessage = this.add.text(player.x - 80, player.y, message, {
-          font: "24px Arial",
-          fill: "#f00",
-        });
-        finishMessage.setScrollFactor(0);
         player.setVelocity(0);
+        if (drunkenness >= 50) {
+          var msg = this.add
+            .text(config.width / 2, config.height / 2, "Afterski!", {
+              font: "24px Arial",
+              fill: "#f00",
+            })
+            .setScrollFactor(0);
+          msg.setOrigin(0.5);
+        } else {
+          var msg = this.add
+            .text(
+              config.width / 2,
+              config.height / 2,
+              "Not drunk enough for afterski!",
+              { font: "24px Arial", fill: "#f00" }
+            )
+            .setScrollFactor(0);
+          msg.setOrigin(0.5);
+        }
       }
     </script>
   </body>
