@@ -38,14 +38,16 @@
         this.load.image("redwine", "/img/redwine.png");
         this.load.image("beer", "/img/beer.png");
         this.load.image("shotteglass", "/img/shotteglass.png");
+        this.load.audio("bgm", "/audio/music.mp3");
       }
       function create() {
+        this.sound.add("bgm", { loop: true }).play();
         this.cameras.main.setBackgroundColor("#ffffff");
         player = this.physics.add.sprite(180, 50, "player");
         player.setCollideWorldBounds(true);
         player.body.setSize(
           player.displayWidth * 0.3,
-          player.displayHeight * 0.2
+          player.displayHeight * 0.3
         );
         cursors = this.input.keyboard.createCursorKeys();
         trees = this.physics.add.staticGroup();
